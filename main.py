@@ -5,6 +5,7 @@ import os.path
 import tile
 
 from argparse import ArgumentParser, ArgumentTypeError
+from classifiers import BaseTerrainClassifier
 from civ_encoder import CivVEncoder
 
 # determine if the path given is a valid file with .png extension
@@ -33,12 +34,16 @@ def main():
     img = mpimg.imread(args.filename)
     tiles = tile.img_to_tiles(img, args.length)
 
+    # build the classifier
+    btc = BaseTerrainClassifier()
+    btc.fit()
+
     # classify the base terrain of each Tile
     for t in tiles.reshape(-1):
         # this is where we will use our classifier
-        t.base = 1
+        t.base = btc.predict(t.get_image())
 
-
+    print type(tiles[0][0].base)
     print json.dumps(tiles, cls=CivVEncoder)
 
 
